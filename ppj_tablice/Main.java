@@ -1,0 +1,139 @@
+import java.lang.Math; 
+import java.util.ArrayList; 
+ 
+public class Main  
+{ 
+  public static void main(String[] args){ 
+        testsClassify(); 
+        testsAreLinearyDependent(); 
+    } 
+ 
+ 
+    private static double getRadius(double x, double y, double z) 
+    { 
+        double sub_radius = Math.sqrt(x * x + y * y); 
+        return Math.sqrt(sub_radius * sub_radius + z * z); 
+    } 
+ 
+ 
+    private static void setUp(int[] input) 
+    { 
+        Point[] points = Point.fromInts(input); 
+        // Klasyfikacja na punkty. 
+        Ring[] rings = Ring.classifyPointsToRings(points); 
+        System.out.println("Klasyfikacja punktow do pierscieni:");  
+        System.out.println(Ring.ringsToString(rings)); 
+ 
+ 
+        // Obliczanie maciezy obrotu 
+        RotationMatrix[] rotationMatrixes = new RotationMatrix[rings.length * 2]; 
+        for(int i = 0; i < rings.length; i++) 
+        {  
+            RotationMatrix[] matrixes = rings[i].getViewOnXY(); 
+            rotationMatrixes[2 * i] = matrixes[0]; 
+            rotationMatrixes[2 * i + 1] = matrixes[1]; 
+        } 
+        System.out.println("Wyznaczone macieze obrotow:");  
+        for(RotationMatrix rm: rotationMatrixes) 
+            System.out.println(rm); 
+ 
+ 
+   //Obliczanie promienia minimalnego dysku 
+        double act_max = 0; 
+        for(Point p: points) 
+         act_max = Math.max(act_max, p.r); 
+        System.out.println("Promien minimalnego dysku:"); 
+   System.out.println(act_max); 
+    
+    	double act_min = 0;
+	for(Point p: points)
+	 act_min = Math.min(act_min, p.r);
+	System.out.println("Promien wewnetrzny minimalnego dysku");
+    System.out.println(act_min+"\n");
+    } 
+   
+    private static void testSimpleClassify() 
+    { 
+        int[] input = { 
+            1, 0, 0, // A 
+            0, 1, 0, // B 
+            -1, 0, 0, // C 
+            0, -1, 0, // D  
+            0, 0, 1, // E 
+            2, 3, 4 // F - promien nie rowna sie 1 tak jak dla A, B, C, D 
+            // A, B, C, D naleza do jednego pierscienia a punkt E do niego nie nalezy mimo tego samego promienia. 
+        }; 
+        setUp(input); 
+    } 
+ 
+ 
+    private static void testSimpleClassify2() 
+    { 
+        int[] input = { 
+            1, 0, 0, 
+            0, 0, 1, 
+            0, 0, -1, 
+            0, 0, -1, 
+            -1, 0, 0, 
+ 
+ 
+        }; 
+   setUp(input); 
+    } 
+ 
+ 
+    private static void testSimpleClassify3() 
+    { 
+        int[] input = { 
+            0, 0, 1, 
+            0, 0, -1, 
+            1, 0, 0, 
+            0, 0, -1, 
+            -1, 0, 0, 
+ 
+ 
+        }; 
+   setUp(input); 
+    } 
+ 
+ 
+    private static void testLinearyDependentOne(Point p1, Point p2, boolean result) 
+    { 
+        if(p1.areLinearyDependent(p2) == result) 
+            System.out.println("Test ok"); 
+        else 
+            System.out.println("Test fail: " + p1 + p2 + "result = " + result); 
+    } 
+ 
+ 
+    private static void testsAreLinearyDependent() 
+    { 
+        testLinearyDependentOne(new Point(1, 0, 0), new Point(1, 0, 0), true); 
+        testLinearyDependentOne(new Point(1, 0, 0), new Point(0, 1, 0), false); 
+        testLinearyDependentOne(new Point(1, 0, 0), new Point(0, 0, 1), false); 
+        testLinearyDependentOne(new Point(1, 0, 0), new Point(0, 0, 0), false); 
+        testLinearyDependentOne(new Point(0, 1, 0), new Point(1, 0, 0), false); 
+        testLinearyDependentOne(new Point(0, 1, 0), new Point(0, 1, 0), true); 
+        testLinearyDependentOne(new Point(0, 1, 0), new Point(0, 0, 1), false); 
+        testLinearyDependentOne(new Point(0, 1, 0), new Point(0, 0, 0), false); 
+        testLinearyDependentOne(new Point(0, 0, 1), new Point(1, 0, 0), false); 
+        testLinearyDependentOne(new Point(0, 0, 1), new Point(0, 1, 0), false); 
+        testLinearyDependentOne(new Point(0, 0, 1), new Point(0, 0, 1), true); 
+        testLinearyDependentOne(new Point(0, 0, 1), new Point(0, 0, 0), false); 
+        testLinearyDependentOne(new Point(0, 0, 0), new Point(1, 0, 0), false); 
+        testLinearyDependentOne(new Point(0, 0, 0), new Point(0, 1, 0), false); 
+        testLinearyDependentOne(new Point(0, 0, 0), new Point(0, 0, 1), false); 
+        testLinearyDependentOne(new Point(0, 0, 0), new Point(0, 0, 0), true); 
+ 
+ 
+    } 
+ 
+ 
+    private static void testsClassify() 
+    { 
+        testSimpleClassify(); 
+        testSimpleClassify2(); 
+        testSimpleClassify3(); 
+    } 
+} 
+ 
