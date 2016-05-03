@@ -11,6 +11,7 @@ public final class RandomString {
 	String [] res = new String[length];
 	for(int i = 0; i<length; i++) {
 		res[i] = new BigInteger(130, random).toString(32);
+		res[i].toCharArray();
 	} 
     return res;
   }
